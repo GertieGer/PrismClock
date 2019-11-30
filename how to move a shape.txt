@@ -1,0 +1,15 @@
+stack(
+	AnimatedPositioned(
+		CustomPaint(
+					  //                       <-- CustomPaint widget
+					  size: Size(300, 300),
+					  painter: 
+						  class MyPainter extends CustomPainter {
+							{
+								void paint(Canvas canvas, Size size) {
+									paint.blendMode = BlendMode.multiply;
+								 }
+							}
+		)							  
+	)
+)
