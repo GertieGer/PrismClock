@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+
 
 Widget redCircle = CustomPaint(
-  size: Size(300, 300),
+  size: Size(window.physicalSize.height*(5/3), window.physicalSize.height),
   painter: RedPainter(),
 );
 
 class RedPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
+    Path path = Path();
     var circle = Offset.zero;
+   
     // var gradient = RadialGradient(
     //   center: const Alignment(0.7, -0.6),
     //   radius: 0.2,
@@ -22,8 +26,11 @@ class RedPainter extends CustomPainter {
     Paint paint = Paint()
     ..color = Color.fromRGBO(255, 0, 0, 1);
     //..blendMode = BlendMode.multiply;
+    path.addPolygon([Offset.zero,Offset(size.width,0),Offset(size.width, 50.0)], true);
+    canvas.drawPath(path, paint);
+    //canvas.drawCircle(circle, 100.0, paint);
 
-    canvas.drawCircle(circle, 100.0, paint);
+    
   }
 
   @override

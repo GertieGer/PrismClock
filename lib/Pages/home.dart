@@ -40,8 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
             Stack(
               children: <Widget>[
                 redCircle,
-                blueCircle,
-                greenCircle,
+                //blueCircle,
+                //greenCircle,
               ],
             ),
             // Text(
