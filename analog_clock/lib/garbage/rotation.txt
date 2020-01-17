@@ -1,0 +1,18 @@
+import 'package:flutter/animation.dart';
+import 'package:flutter/material.dart';
+
+AnimationController rotationController;
+@override
+void initState() {
+  rotationController = AnimationController(
+    duration: const Duration(milliseconds: 500), 
+    //vsync: this,
+    );
+  super.initState(); 
+}
+//...
+RotationTransition(
+  turns: Tween(begin: 0.0, end: 1.0).animate(rotationController),
+  child: ImgButton(...)
+//...
+rotationController.forward(from: 0.0); // it starts the animation
