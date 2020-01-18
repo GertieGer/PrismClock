@@ -22,4 +22,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/prism.flr
+    - assets/stars.png
     - google_fonts/
