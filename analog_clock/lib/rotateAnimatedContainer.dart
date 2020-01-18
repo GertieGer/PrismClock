@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 class RotatingHand extends StatelessWidget{
 
   RotatingHand({
@@ -20,6 +19,8 @@ class RotatingHand extends StatelessWidget{
           //alignment: Alignment.center : AlignmentDirectional.topCenter,
           duration: (angleRadians!=0? duration : Duration(milliseconds: 950)),
           child: child,
+          // child: Transform.rotate(child: child,
+          // angle: angleRadians,),
         );
   }
 }

@@ -16,7 +16,6 @@ import './static_hand.dart';
 import 'NumberColumn.dart';
 import 'dart:math' as math;
 
-
 class AnalogClock extends StatefulWidget {
   const AnalogClock(this.model);
 
@@ -122,25 +121,30 @@ class _AnalogClockState extends State<AnalogClock> {
       ),
     );
 
-    final appWidth =  MediaQuery.of(context).size.height*(5/3);
-    final appHeight =  MediaQuery.of(context).size.height;;
-    
-    final prismPosition = EdgeInsets.only(top: appHeight/3, left: 0);
-    final lightPosition = EdgeInsets.only(top: prismPosition.top+60, left: 115.0);
+    final appHeight = MediaQuery.of(context).size.height;
+    final appWidth = appHeight * (5 / 3);
 
+    final prismPosition = EdgeInsets.only(top: appHeight / 3, left: 0);
+    final prismSize = appHeight / 2.5;
+
+    final lightPosition = EdgeInsets.only(
+        top: (prismPosition.top + prismSize / 4), left: prismSize * 0.6);
     final scaleOffset = 26;
-    
-    final double startAngle = math.atan(lightPosition.top/(appWidth-lightPosition.left-scaleOffset));
-    final double endAngle = -math.atan((appHeight-lightPosition.top)/(appWidth-lightPosition.left-scaleOffset));
-    final double totalAngle = startAngle-endAngle;
-    //print("start: "+math.atan((appHeight*((0+1)/60)-lightPosition.top)/(appWidth-lightPosition.left-scaleOffset)).toString());
-    //print("end: "+math.atan((appHeight*((60+1)/60)-lightPosition.top)/(appWidth-lightPosition.left-scaleOffset)).toString());
-    double getRadiansbyTime(double time){
-      return math.atan((appHeight*((time+1)/60)-lightPosition.top)/(appWidth-lightPosition.left-scaleOffset));
+
+    double getRadiansbyTime(double time) {
+      return math.atan(((appHeight * (time+1) / 60) - lightPosition.top) /
+          (appWidth - lightPosition.left - scaleOffset));
     }
+
+    final double startAngle = getRadiansbyTime(-1.0);
+    final double endAngle = getRadiansbyTime(59);
+    final double totalAngle = startAngle - endAngle;
+
+    //print("end: "+endAngle.toString());
+
     // final radiansPerTick = radians(360 / 60);
-     //final radiansPerHour = radians(360 / 12);
- 
+    //final radiansPerHour = radians(360 / 12);
+
     return Semantics.fromProperties(
       properties: SemanticsProperties(
         label: 'Analog clock with time $time',
@@ -149,34 +153,38 @@ class _AnalogClockState extends State<AnalogClock> {
       child: Container(
         color: customTheme.backgroundColor,
         child: Stack(
-          children: [ 
+          children: [
             Stack(
               children: [
-                Padding(
-                  padding: lightPosition,
+                Container(
+                  margin: lightPosition,
                   child: RotatingHand(
                     duration: Duration(minutes: 1),
                     child: DrawnStaticHand(
                       color: Color.fromRGBO(255, 0, 0, 1), //RED - HOURS
                       accent: Color.fromRGBO(255, 50, 0, 1),
                     ),
-                    angleRadians: getRadiansbyTime((_now.hour > 12 ? _now.hour - 12 : _now.hour)+(_now.minute / 60)),
+                    angleRadians: getRadiansbyTime(
+                        (_now.hour > 12 ? _now.hour - 12 : _now.hour) +
+                            (_now.minute / 60)),
                   ),
                 ),
-                Padding(
-                  padding: lightPosition,
+                Container(
+                  margin: lightPosition,
                   child: RotatingHand(
-                    duration: Duration(minutes: 1),
+                    //duration: Duration(minutes: 1),
+                    duration: Duration(seconds: 1), //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
                     child: DrawnStaticHand(
                       color: Color.fromRGBO(0, 255, 0, 1), //GREEN - MINUTES
                       accent: Color.fromRGBO(0, 255, 50, 1),
                     ),
                     //angleRadians: (_now.minute * radiansPerTick),
-                    angleRadians: getRadiansbyTime(_now.minute.toDouble()),
+                    //angleRadians: getRadiansbyTime(_now.minute.toDouble()),
+                    angleRadians: startAngle,
                   ),
                 ),
-                Padding(
-                  padding: lightPosition,
+                Container(
+                  margin: lightPosition,
                   child: RotatingHand(
                     duration: Duration(seconds: 1),
                     child: DrawnStaticHand(
@@ -184,7 +192,8 @@ class _AnalogClockState extends State<AnalogClock> {
                       accent: Color.fromRGBO(50, 0, 255, 1),
                     ),
                     //angleRadians: (_now.second * radiansPerTick),
-                    angleRadians: getRadiansbyTime(_now.second.toDouble()),
+                    //angleRadians: getRadiansbyTime(_now.second.toDouble()),
+                    angleRadians: endAngle,
                   ),
                 ),
               ],
@@ -202,13 +211,18 @@ class _AnalogClockState extends State<AnalogClock> {
               ],
               mainAxisAlignment: MainAxisAlignment.end,
             ),
-            Container(
-              margin: prismPosition,
-              child: FlareActor("assets/prism.flr",
-                  alignment: Alignment.topLeft,
-                  fit: BoxFit.contain,
-                  animation: "spin"),
-              height: appHeight / 3,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  child: FlareActor("assets/prism.flr",
+                      alignment: Alignment.centerLeft,
+                      fit: BoxFit.contain,
+                      animation: "spin"),
+                  height: prismSize,
+                  width: prismSize,
+                ),
+              ],
             ),
           ],
         ),
