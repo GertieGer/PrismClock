@@ -15,12 +15,9 @@ class RotatingHand extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-          transform: Matrix4.rotationZ(angleRadians),//*(30.96/360)),
-          //alignment: Alignment.center : AlignmentDirectional.topCenter,
+          transform: Matrix4.rotationZ(angleRadians),
           duration: (angleRadians!=0? duration : Duration(milliseconds: 950)),
           child: child,
-          // child: Transform.rotate(child: child,
-          // angle: angleRadians,),
         );
   }
 }

@@ -178,10 +178,6 @@ class _ClockCustomizerState extends State<ClockCustomizer> {
         aspectRatio: 5 / 3,
         child: Container(
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/stars.png"),
-              fit: BoxFit.cover,
-            ),
             border: Border.all(
               width: 2,
               color: Theme.of(context).unselectedWidgetColor,

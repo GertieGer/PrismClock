@@ -8,7 +8,6 @@ import 'package:flutter_clock_helper/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:intl/intl.dart';
-import 'package:vector_math/vector_math_64.dart' show radians;
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
 import './rotateAnimatedContainer.dart';
@@ -71,9 +70,6 @@ class _AnalogClockState extends State<AnalogClock> {
   void _updateTime() {
     setState(() {
       _now = DateTime.now();
-      //print(_now);
-      // Update once per second. Make sure to do it at the beginning of each
-      // new second, so that the clock is accurate.
       _timer = Timer(
         Duration(seconds: 1) - Duration(milliseconds: _now.millisecond),
         _updateTime,
@@ -83,56 +79,24 @@ class _AnalogClockState extends State<AnalogClock> {
 
   @override
   Widget build(BuildContext context) {
-    // There are many ways to apply themes to your clock. Some are:
-    //  - Inherit the parent Theme (see ClockCustomizer in the
-    //    flutter_clock_helper package).
-    //  - Override the Theme.of(context).colorScheme.
-    //  - Create your own [ThemeData], demonstrated in [AnalogClock].
-    //  - Create a map of [Color]s to custom keys, demonstrated in
-    //    [DigitalClock].
-    final customTheme = Theme.of(context).brightness == Brightness.light
-        ? Theme.of(context).copyWith(
-            // Hour hand.
-            primaryColor: Colors.black,
-            // Minute hand.
-            highlightColor: Colors.black,
-            // Second hand.
-            accentColor: Colors.black,
-            //backgroundColor: Color(0xFFD2E3FC),
-            backgroundColor: Colors.black,
-          )
-        : Theme.of(context).copyWith(
-            primaryColor: Color(0xFFD2E3FC),
-            highlightColor: Color(0xFF4285F4),
-            accentColor: Color(0xFF8AB4F8),
-            backgroundColor: Color(0xFF3C4043),
-          );
-
     final time = DateFormat.Hms().format(DateTime.now());
-    final weatherInfo = DefaultTextStyle(
-      style: TextStyle(color: customTheme.primaryColor),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(_temperature),
-          Text(_temperatureRange),
-          Text(_condition),
-          Text(_location),
-        ],
-      ),
-    );
 
     SystemChrome.setEnabledSystemUIOverlays([]);
-
-    final appHeight = MediaQuery.of(context).size.height;
+    double safearea = 26; //THIS ISNT ACCTUALY TRUE
+    final appHeight = MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom - safearea;
+    // notic this appHeight isn't accurate with safe area, thats 
     final appWidth = appHeight * (5 / 3);
 
-    final prismPosition = EdgeInsets.only(top: 0, left: appWidth / 10);
-    final prismSize = appHeight / 2.5;
+    // Prism Position & size
+    final prismPosition = EdgeInsets.only(top: 0, left: appWidth / 12.5);
+    final prismSize = appHeight / 2;
 
+    // Light Position
     final lightPosition = EdgeInsets.only(
         top: ((appHeight / 3) + prismSize / 4),
-        left: prismPosition.left + (prismSize * 0.6));
+        left: prismPosition.left + (prismSize * 0.65));
+
+    // Offset due to the Numbers
     final scaleOffset = 35;
 
     double getRadiansbyTime(double time, double type) {
@@ -151,41 +115,30 @@ class _AnalogClockState extends State<AnalogClock> {
       return angle;
     }
 
-    final double startAngle = getRadiansbyTime(0, 12);
-    final double endAngle = getRadiansbyTime(59, 60);
-    // final double totalAngle = startAngle - endAngle;
-
-    // print("hour: "+((_now.hour > 12 ? _now.hour - 12 : _now.hour) +
-    //                         (_now.minute / 60)).toString());
-    // print("hour: "+(_now.hour).toString());
-
-    // final radiansPerTick = radians(360 / 60);
-    //final radiansPerHour = radians(360 / 12);
-
     return Semantics.fromProperties(
       properties: SemanticsProperties(
         label: 'Analog clock with time $time',
         value: time,
       ),
       child: Container(
-        color: customTheme.backgroundColor,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/stars.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Stack(
           children: [
-            Container(
-              child: FittedBox(
-                child: Image.asset('assets/stars.png'),
-                //fit: BoxFit.fill,
-              ),
-            ),
-            WhiteLight(),
+            WhiteLight(), // The light entering the prism
             Stack(
               children: [
                 Container(
+                  // HOUR HAND
                   margin: lightPosition,
                   child: RotatingHand(
                     duration: Duration(minutes: 1),
                     child: DrawnStaticHand(
-                      color: Color.fromRGBO(255, 0, 0, 1), //RED - HOURS
+                      color: Color.fromRGBO(255, 0, 0, 1), //RED
                       accent: Color.fromRGBO(255, 50, 0, 1),
                     ),
                     angleRadians: getRadiansbyTime(
@@ -195,48 +148,41 @@ class _AnalogClockState extends State<AnalogClock> {
                   ),
                 ),
                 Container(
+                  // MINUTES HAND
                   margin: lightPosition,
                   child: RotatingHand(
                     duration: Duration(minutes: 1),
-                    //duration: Duration(seconds: 1), //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
                     child: DrawnStaticHand(
-                      color: Color.fromRGBO(0, 255, 0, 1), //GREEN - MINUTES
+                      color: Color.fromRGBO(0, 255, 0, 1), //GREEN
                       accent: Color.fromRGBO(0, 255, 50, 1),
                     ),
-                    //angleRadians: (_now.minute * radiansPerTick),
                     angleRadians: getRadiansbyTime(_now.minute.toDouble(), 60),
-                    //angleRadians: startAngle
                   ),
                 ),
                 Container(
+                  //SECONDS HAND
                   margin: lightPosition,
                   child: RotatingHand(
                     duration: Duration(seconds: 1),
                     child: DrawnStaticHand(
-                      color: Color.fromRGBO(0, 0, 255, 1), //BLUE - SECONDS
+                      color: Color.fromRGBO(0, 0, 255, 1), //BLUE
                       accent: Color.fromRGBO(50, 0, 255, 1),
                     ),
-                    //angleRadians: (_now.second * radiansPerTick),
-                    angleRadians: getRadiansbyTime(_now.second.toDouble(), 60),
-                    //angleRadians: endAngle,
+                    angleRadians:
+                        getRadiansbyTime((_now.second).toDouble(), 60),
                   ),
                 ),
               ],
             ),
             Row(
+              // Numbers - Hours and minutes
               children: <Widget>[
-                // FloatingActionButton(
-                //   child: Text(
-                //     _now.toString(),
-                //     style: TextStyle(color: Colors.black, fontSize: 10),
-                //   ),
-                //   onPressed: () => {},
-                // ),
                 NumberColumn(),
               ],
               mainAxisAlignment: MainAxisAlignment.end,
             ),
             Column(
+              //Prism Animation
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
